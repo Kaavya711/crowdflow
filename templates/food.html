@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Food & Drinks{% endblock %}
+{% block header %}VENDOR METRICS{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;gap:24px;">
+
+    <!-- Filters -->
+    <div style="display:flex;gap:12px;">
+        <button class="filter-btn" style="background:rgba(88,166,255,0.12); border:1px solid rgba(88,166,255,0.3); color:#58A6FF; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 22px; border-radius:30px; cursor:pointer;" onclick="setFilter(this, 'all')">All Options</button>
+        <button class="filter-btn" style="background:transparent; border:1px solid transparent; color:#8B949E; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 22px; border-radius:30px; cursor:pointer;" onclick="setFilter(this, 'low')">Low Crowd</button>
+        <button class="filter-btn" style="background:transparent; border:1px solid transparent; color:#8B949E; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 22px; border-radius:30px; cursor:pointer;" onclick="setFilter(this, 'fast')">Fastest Turnaround</button>
+    </div>
+
+    <!-- 3-Col Grid -->
+    <div id="vendor-grid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:20px;">
+        
+        <div class="cf-card clickable vendor-card" data-wait="10" style="padding:24px; display:flex; flex-direction:column;" onclick="openModal('BURGER HOUSE', 'Queue size exceeds nominal baseline.')">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px;">
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:18px; color:#E6EDF3;">Burger House</h3>
+                <span class="badge-blue" style="background:transparent;">NON-VEG</span>
+            </div>
+            
+            <div class="section-title">QUEUE ESTIMATION</div>
+            <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:32px; color:#F85149; margin-bottom:16px;">10 MIN</div>
+            
+            <div class="progress-track" style="margin-bottom:32px;">
+                <div class="progress-fill-red progress-fill" style="width: 0%;" data-width="85"></div>
+            </div>
+            
+            <button class="btn-outline" style="width:100%; pointer-events:none;">VENDOR DETAIL</button>
+        </div>
+
+        <div class="cf-card clickable vendor-card" data-wait="2" style="padding:24px; display:flex; flex-direction:column;" onclick="openModal('GREEN BOWL', 'Nominal flow.')">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px;">
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:18px; color:#E6EDF3;">Green Bowl</h3>
+                <span class="badge-blue" style="background:transparent;">VEG</span>
+            </div>
+            
+            <div class="section-title">QUEUE ESTIMATION</div>
+            <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:32px; color:#3FB950; margin-bottom:16px;">2 MIN</div>
+            
+            <div class="progress-track" style="margin-bottom:32px;">
+                <div class="progress-fill-green progress-fill" style="width: 0%;" data-width="15"></div>
+            </div>
+            
+            <button class="btn-outline" style="width:100%; pointer-events:none;">VENDOR DETAIL</button>
+        </div>
+
+        <div class="cf-card clickable vendor-card" data-wait="5" style="padding:24px; display:flex; flex-direction:column; border-color:rgba(227,179,65,0.4);" onclick="openModal('COMBO CORNER', 'Active promo.')">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:18px; color:#E6EDF3;">Combo Corner</h3>
+                </div>
+                <span class="badge-amber">LIVE PROMO</span>
+            </div>
+            
+            <div class="section-title">QUEUE ESTIMATION</div>
+            <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:32px; color:#E3B341; margin-bottom:16px;">5 MIN</div>
+            
+            <div class="progress-track" style="margin-bottom:32px;">
+                <div class="progress-fill-blue progress-fill" style="background:linear-gradient(90deg,#E3B341,#F2C94C); width: 0%;" data-width="45"></div>
+            </div>
+            
+            <button class="btn-outline" style="width:100%; border-color:rgba(227,179,65,0.4); color:#E3B341; pointer-events:none;">PROMO ACTIVE</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function setFilter(btn, filter) {
+    document.querySelectorAll('.filter-btn').forEach(el => {
+        el.style.background = 'transparent';
+        el.style.borderColor = 'transparent';
+        el.style.color = '#8B949E';
+    });
+    btn.style.background = 'rgba(88,166,255,0.12)';
+    btn.style.borderColor = 'rgba(88,166,255,0.3)';
+    btn.style.color = '#58A6FF';
+
+    const grid = document.getElementById('vendor-grid');
+    const items = Array.from(grid.querySelectorAll('.vendor-card'));
+
+    items.forEach(el => el.style.display = 'flex');
+
+    if(filter === 'low') {
+        items.forEach(el => {
+            if(parseInt(el.getAttribute('data-wait')) > 5) el.style.display = 'none';
+        });
+    } else if(filter === 'fast') {
+        items.sort((a,b) => parseInt(a.getAttribute('data-wait')) - parseInt(b.getAttribute('data-wait')));
+        items.forEach(el => grid.appendChild(el));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.progress-fill').forEach(bar => {
+    const target = bar.getAttribute('data-width');
+    setTimeout(() => {
+      bar.style.transition = 'width 1s cubic-bezier(0.4, 0, 0.2, 1)';
+      bar.style.width = target + '%';
+    }, 300);
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Gates & Entrances{% endblock %}
+{% block header %}GATES & ENTRANCES{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;gap:12px;">
+
+    <!-- Gate Row -->
+    <div class="cf-card clickable gate-row" style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-left:3px solid #F85149;"
+         onclick="openModal('GATE E', 'Entrance Type: East Public Entry<br>Status: Critical<br><br>Scanner failure active. Recommend full rerouting.')">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div style="width:10px; height:10px; border-radius:50%; background:#F85149; animation:pulse 2s infinite;"></div>
+            <div>
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#E6EDF3; margin-bottom:4px;">Gate E</h3>
+                <span style="font-family:'Space Grotesk'; font-size:12px; color:#8B949E;">East Public Entry</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:40px;">
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">THROUGHPUT</span>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#8B949E;">45 pax/min</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:72px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">WAIT TIME</span>
+                <span class="badge-red">18 MIN</span>
+            </div>
+            <div style="width:80px; text-align:right;">
+                <span style="font-family:'Space Grotesk'; font-size:12px; font-weight:500; letter-spacing:0.05em; color:#F85149; text-transform:uppercase;">CRITICAL</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gate Row -->
+    <div class="cf-card clickable gate-row" style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-left:3px solid #E3B341;"
+         onclick="openModal('GATE D', 'Entrance Type: West VIP Corridors<br>Status: Elevated')">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div style="width:10px; height:10px; border-radius:50%; background:#E3B341;"></div>
+            <div>
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#E6EDF3; margin-bottom:4px;">Gate D</h3>
+                <span style="font-family:'Space Grotesk'; font-size:12px; color:#8B949E;">West VIP Corridors</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:40px;">
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">THROUGHPUT</span>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#8B949E;">90 pax/min</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:72px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">WAIT TIME</span>
+                <span class="badge-amber">08 MIN</span>
+            </div>
+            <div style="width:80px; text-align:right;">
+                <span style="font-family:'Space Grotesk'; font-size:12px; font-weight:500; letter-spacing:0.05em; color:#E3B341; text-transform:uppercase;">ELEVATED</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gate Row -->
+    <div class="cf-card clickable gate-row" style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-left:3px solid #3FB950;"
+         onclick="openModal('GATE F', 'Entrance Type: South Plaza Main<br>Status: Clear')">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div style="width:10px; height:10px; border-radius:50%; background:#3FB950;"></div>
+            <div>
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#E6EDF3; margin-bottom:4px;">Gate F</h3>
+                <span style="font-family:'Space Grotesk'; font-size:12px; color:#8B949E;">South Plaza Main</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:40px;">
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">THROUGHPUT</span>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#8B949E;">145 pax/min</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:72px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">WAIT TIME</span>
+                <span class="badge-green">02 MIN</span>
+            </div>
+            <div style="width:80px; text-align:right;">
+                <span style="font-family:'Space Grotesk'; font-size:12px; font-weight:500; letter-spacing:0.05em; color:#3FB950; text-transform:uppercase;">CLEAR</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gate Row -->
+    <div class="cf-card clickable gate-row" style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-left:3px solid #3FB950;"
+         onclick="openModal('GATE A', 'Entrance Type: North Gate Alpha<br>Status: Clear')">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div style="width:10px; height:10px; border-radius:50%; background:#3FB950;"></div>
+            <div>
+                <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#E6EDF3; margin-bottom:4px;">Gate A</h3>
+                <span style="font-family:'Space Grotesk'; font-size:12px; color:#8B949E;">North Gate Alpha</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:40px;">
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">THROUGHPUT</span>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#8B949E;">130 pax/min</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:72px;">
+                <span style="font-family:'Space Grotesk'; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:#484F58;">WAIT TIME</span>
+                <span class="badge-green">04 MIN</span>
+            </div>
+            <div style="width:80px; text-align:right;">
+                <span style="font-family:'Space Grotesk'; font-size:12px; font-weight:500; letter-spacing:0.05em; color:#3FB950; text-transform:uppercase;">CLEAR</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.gate-row').forEach((row, i) => {
+    row.style.opacity = '0';
+    row.style.animation = `slideInLeft 0.35s ease forwards`;
+    row.style.animationDelay = `${i * 100}ms`;
+  });
+});
+</script>
+{% endblock %}

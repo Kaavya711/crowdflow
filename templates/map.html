@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}Stadium Map{% endblock %}
+{% block header %}STADIUM MAP{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;gap:32px;">
+
+  <!-- Ellipse Map Container -->
+  <div style="width:100%; height:550px; position:relative; display:flex; align-items:center; justify-content:center; padding:24px;">
+    
+    <!-- Outer Stadium Oval -->
+    <div style="position:absolute; inset:24px 32px; background:#0D1117; border:1px solid #30363D; border-radius:50%; box-shadow:inset 0 0 40px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
+      
+      <!-- Inner Field Ellipse -->
+      <div style="width:30%; height:40%; background:#161B22; border:1px solid #30363D; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+        <span style="font-family:'Space Grotesk';font-weight:700;font-size:24px;letter-spacing:0.3em;color:#484F58;">FIELD</span>
+      </div>
+      
+    </div>
+
+    <!-- Bubble Nodes -->
+    <style>
+      .map-bubble {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s;
+        border: 2px solid transparent;
+      }
+      .map-bubble:hover {
+        transform: scale(1.1);
+        z-index: 20;
+      }
+      @keyframes ripple {
+        0%   { transform: scale(1);   opacity: 0.6; }
+        100% { transform: scale(1.8); opacity: 0; }
+      }
+      .bubble-critical::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(248,81,73,0.3);
+        animation: ripple 1.8s ease-out infinite;
+        z-index: -1;
+      }
+      .bubble-critical { position: relative; }
+    </style>
+
+    <!-- Map Nodes positioning based on geographical layout -->
+    <div class="map-bubble bubble-critical" style="top:5%; left:50%; transform:translateX(-50%); width:90px; height:90px; background:#F85149; color:#F85149;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'"
+         onclick="openModal('NORTH STAND', 'Density: 92%<br>Status: High / Severe Bottleneck<br><br>Recommended Action: Deploy crowd management staff to redirect to West Wing.')">
+        <span style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:#080C14;">92%</span>
+        <span style="font-family:'Space Grotesk';font-size:9px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;">N.Stand</span>
+    </div>
+
+    <div class="map-bubble" style="bottom:5%; left:50%; transform:translateX(-50%); width:70px; height:70px; background:#3FB950; color:#3FB950;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'"
+         onclick="openModal('SOUTH STAND', 'Density: 41%<br>Status: Low<br><br>All metrics optimal.')">
+        <span style="font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:#080C14;">41%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;">S.Stand</span>
+    </div>
+
+    <div class="map-bubble" style="top:50%; right:8%; transform:translateY(-50%); width:76px; height:76px; background:#E3B341; color:#E3B341;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'"
+         onclick="openModal('EAST WING', 'Density: 74%<br>Status: Medium')">
+        <span style="font-family:'JetBrains Mono';font-size:18px;font-weight:700;color:#080C14;">74%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;">E.Wing</span>
+    </div>
+
+    <div class="map-bubble" style="top:50%; left:8%; transform:translateY(-50%); width:76px; height:76px; background:#E3B341; color:#E3B341;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'"
+         onclick="openModal('WEST WING', 'Density: 54%<br>Status: Medium')">
+        <span style="font-family:'JetBrains Mono';font-size:18px;font-weight:700;color:#080C14;">54%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;">W.Wing</span>
+    </div>
+
+    <div class="map-bubble bubble-critical" style="bottom:25%; left:20%; width:84px; height:84px; background:#F85149; color:#F85149;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'"
+         onclick="openModal('MAIN CONCOURSE', 'Density: 88%<br>Status: Critical')">
+        <span style="font-family:'JetBrains Mono';font-size:18px;font-weight:700;color:#080C14;">88%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;text-align:center;">Main<br>Course</span>
+    </div>
+
+    <div class="map-bubble" style="top:25%; left:22%; width:70px; height:70px; background:#E3B341; color:#E3B341;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'">
+        <span style="font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:#080C14;">68%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;text-align:center;">Food<br>Court</span>
+    </div>
+
+    <div class="map-bubble" style="top:25%; right:22%; width:64px; height:64px; background:#3FB950; color:#3FB950;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'">
+        <span style="font-family:'JetBrains Mono';font-size:14px;font-weight:700;color:#080C14;">22%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;">VIP</span>
+    </div>
+
+    <div class="map-bubble" style="bottom:22%; right:20%; width:60px; height:60px; background:#3FB950; color:#3FB950;"
+         onmouseover="this.style.boxShadow='0 0 20px currentColor'" onmouseout="this.style.boxShadow='none'">
+        <span style="font-family:'JetBrains Mono';font-size:14px;font-weight:700;color:#080C14;">15%</span>
+        <span style="font-family:'Space Grotesk';font-size:8px;color:rgba(8,12,20,0.8);font-weight:600;text-transform:uppercase;text-align:center;">Gate<br>Plaza</span>
+    </div>
+
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:32px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#3FB950;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#8B949E;">LOW</span></div>
+    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#E3B341;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#8B949E;">MEDIUM</span></div>
+    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#E6EDF3;">CRITICAL</span></div>
+  </div>
+
+  <!-- 8 Card Grid -->
+  <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;">
+    
+    <div class="cf-card clickable" style="padding:20px;" onclick="openModal('NORTH STAND', 'Density: 92%<br>Severe bottleneck.')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">NORTH STAND</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">92%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">High Density</span>
+    </div>
+    
+    <div class="cf-card clickable" style="padding:20px;" onclick="openModal('MAIN CONCOURSE', 'Density: 88%')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">MAIN CONCOURSE</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">88%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">High Density</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">EAST WING</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">74%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">FOOD COURT</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">68%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">WEST WING</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">54%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">SOUTH STAND</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">41%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">VIP LOUNGE</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">22%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
+    </div>
+
+    <div class="cf-card clickable" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">GATE PLAZA</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">15%</div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

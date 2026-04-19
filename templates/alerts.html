@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Alerts{% endblock %}
+{% block header %}INCIDENT TELEMETRY{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;gap:24px;">
+
+    <!-- Pill Tabs -->
+    <div style="display:flex;gap:12px;margin-bottom:8px;">
+        <button id="btn-warnings" class="tab-btn" style="background:rgba(88,166,255,0.12); border:1px solid rgba(88,166,255,0.3); color:#58A6FF; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 24px; border-radius:30px; cursor:pointer;" onclick="switchTab('warnings', this)">Warnings</button>
+        <button id="btn-emergency" class="tab-btn" style="background:#161B22; border:1px solid #30363D; color:#8B949E; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 24px; border-radius:30px; cursor:pointer;" onclick="switchTab('emergency', this)">Emergency</button>
+        <button id="btn-notifications" class="tab-btn" style="background:#161B22; border:1px solid #30363D; color:#8B949E; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 24px; border-radius:30px; cursor:pointer;" onclick="switchTab('notifications', this)">Notifications</button>
+    </div>
+
+    <!-- Warnings Tab -->
+    <div id="tab-warnings" class="tab-content" style="display:flex;flex-direction:column;gap:16px;">
+        <div class="cf-card clickable" style="box-shadow:inset 3px 0 0 #E3B341; background:linear-gradient(90deg, rgba(227,179,65,0.04) 0%, transparent 35%); padding:24px;"
+             onclick="openModal('CONCOURSE VOLUME', 'Volume exceeding safe load threshold.<br><br>Containment Strategy: Shift foot traffic laterally towards external ring exits.')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Main Concourse Volume Warning</h3>
+                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">08:14 UTC</span>
+            </div>
+            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">Volume exceeding safe load threshold. Chokepoints developing.</p>
+        </div>
+    </div>
+
+    <!-- Emergency Tab -->
+    <div id="tab-emergency" class="tab-content" style="display:none;flex-direction:column;gap:16px;">
+        <div class="cf-card clickable alert-emergency" style="box-shadow:inset 3px 0 0 #F85149; background:linear-gradient(90deg, rgba(248,81,73,0.04) 0%, transparent 35%); padding:24px;"
+             onclick="openModal('MEDICAL INCIDENT', 'Medical emergency declared in North Stand pedestrian corridor.<br><br>Containment Strategy: EMS dispatched. Isolate section via mobile barriers.')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Medical Incident at North Stand</h3>
+                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">08:02 UTC</span>
+            </div>
+            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">Immediate response requested. Corridor blockage projected.</p>
+        </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div id="tab-notifications" class="tab-content" style="display:none;flex-direction:column;gap:16px;">
+        <div class="cf-card clickable" style="box-shadow:inset 3px 0 0 #58A6FF; background:linear-gradient(90deg, rgba(88,166,255,0.04) 0%, transparent 35%); padding:24px;"
+             onclick="openModal('INVENTORY PUSH', 'Push notification emitted regarding Combo Corner discount.<br><br>Containment Strategy: No operations changes required.')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Inventory Push at Combo Corner</h3>
+                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">07:44 UTC</span>
+            </div>
+            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">20% push transmitted to active devices.</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById('tab-' + id).style.display = 'flex';
+    
+    document.querySelectorAll('.tab-btn').forEach(el => {
+        el.style.background = '#161B22';
+        el.style.border = '1px solid #30363D';
+        el.style.color = '#8B949E';
+    });
+    
+    btn.style.background = 'rgba(88,166,255,0.12)';
+    btn.style.border = '1px solid rgba(88,166,255,0.3)';
+    btn.style.color = '#58A6FF';
+}
+</script>
+{% endblock %}
