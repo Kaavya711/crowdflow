@@ -1,6 +1,6 @@
 # CrowdFlow
 
-CrowdFlow is a crowd management and monitoring system built for the Warm Up Round.
+CrowdFlow is a crowd management and monitoring system built.
 
 ## Features
 - Live dashboard
