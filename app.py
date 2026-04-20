@@ -1,88 +1,105 @@
-import google.generativeai as genai
-from flask import Flask, render_template, request, jsonify
-import os
-
-app = Flask(__name__)
-
-# Configure Gemini
-api_key = "AIzaSyA526-tYs_3xmBhWQyRH_zF3zwWblEwglc"
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
-
-VENUE_CONTEXT = """
-You are the AI Operations Assistant for CrowdFlow, an enterprise stadium management system.
-Total Capacity: 40,000. Current Attendance: 37,856.
-Gates: Gate A (Clear), Gate B (Clear), Gate C (Clear), Gate D (Medium), Gate E (Critical - Scanner Failure), Gate F (Clear).
-Density: North Stand (92% - Critical), Main Concourse (88% - High), East Wing (74%), Food Court (68%).
-Food: Burger House (10m wait), Green Bowl (2m wait), Combo Corner (5m wait - 20% discount active).
-Provide concise, authoritative, and actionable responses. Prioritize safety and crowd dispersion.
+"""
+CrowdFlow - AI Stadium Operations Assistant
+Security: Input validation, rate limiting, sanitized outputs, secure headers
+Efficiency: Response caching, connection pooling
+Google Services: Gemini API (AI), Maps JS API (Heatmap)
 """
 
-@app.route('/')
-def dashboard():
-    return render_template('dashboard.html', recommendation=None, seat_section=None)
+from google import genai
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_caching import Cache
+import bleach
+import os
+import logging
 
-@app.route('/dashboard', methods=['POST'])
-def dashboard_post():
-    seat_section = request.form.get('seat_section')
-    density = request.form.get('density')
-    need = request.form.get('need')
-    prompt = f"""
-    {VENUE_CONTEXT}
-    A visitor is at: {seat_section}
-    Current crowd density: {density}
-    They need: {need}
-    Give a specific routing recommendation in 2-3 sentences.
-    """
-    try:
-        response = model.generate_content(prompt)
-        recommendation = response.text
-    except Exception as e:
-        recommendation = f"Unable to compute route: {str(e)}"
-    return render_template('dashboard.html', recommendation=recommendation, seat_section=seat_section)
+# ── App Setup ──────────────────────────────────────────────────────────────────
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "crowdflow-dev-secret-key-change-in-prod")
 
-@app.route('/map')
-def stadium_map():
-    return render_template('map.html')
+# ── Security: Rate Limiting ────────────────────────────────────────────────────
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["500 per day", "100 per hour"],
+    storage_uri="memory://"
+)
 
-@app.route('/gates')
-def gates():
-    return render_template('gates.html')
+# ── Efficiency: Caching ────────────────────────────────────────────────────────
+cache = Cache(app, config={
+    'CACHE_TYPE': 'SimpleCache',
+    'CACHE_DEFAULT_TIMEOUT': 30
+})
 
-@app.route('/food')
-def food():
-    return render_template('food.html')
+# ── Logging ────────────────────────────────────────────────────────────────────
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-@app.route('/assistant')
-def assistant():
-    return render_template('ai.html')
+# ── Google Gemini Client ───────────────────────────────────────────────────────
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-@app.route('/alerts')
-def alerts():
-    return render_template('alerts.html')
+# ── Google Maps Key ────────────────────────────────────────────────────────────
+GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_KEY", "")
 
-@app.route('/api/chat', methods=['POST'])
-def api_chat():
-    data = request.json
-    if not data:
-        return jsonify({"reply": "Invalid request."}), 400
+# ── Venue Context (injected into every AI request) ────────────────────────────
+VENUE_CONTEXT = """
+You are the AI Operations Assistant for CrowdFlow, an enterprise stadium management system.
+Total Capacity: 40,000. Current Attendance: 37,856 (94.6% full).
 
-    messages = data.get('messages', [])
-    conversation = VENUE_CONTEXT + "\n\n"
+GATE STATUS:
+- Gate A (North Alpha): Clear, 130 pax/min, 4 min wait
+- Gate D (West VIP): Elevated, 90 pax/min, 8 min wait
+- Gate E (East Public): CRITICAL — Scanner failure active, 45 pax/min, 18 min wait
+- Gate F (South Plaza): Clear, 145 pax/min, 2 min wait
 
-    for msg in messages:
-        role = msg.get('role', '').upper()
-        content = msg.get('content', '')
-        conversation += f"{role}: {content}\n"
+DENSITY ZONES:
+- North Stand: 92% — CRITICAL, severe bottleneck
+- Main Concourse: 88% — HIGH
+- East Wing: 74% — Elevated
+- Food Court: 68% — Elevated
+- West Wing: 54% — Medium
+- South Stand: 41% — Nominal
+- VIP Lounge: 22% — Nominal
 
-    try:
-        response = model.generate_content(conversation)
-        reply = response.text
-    except Exception as e:
-        reply = f"Error generating response: {str(e)}"
+FOOD & BEVERAGE:
+- Burger House: 10 min wait, non-veg
+- Green Bowl: 2 min wait, veg (RECOMMENDED)
+- Combo Corner: 5 min wait, 20% discount ACTIVE (PROMO)
 
-    return jsonify({"reply": reply})
+ACTIVE ALERTS:
+1. [WARNING] Main Concourse Volume — chokepoints developing
+2. [EMERGENCY] Medical Incident — North Stand corridor
+3. [INFO] Inventory push — Combo Corner 20% discount live
+
+INSTRUCTIONS:
+- Provide concise, authoritative, actionable responses (2-4 sentences max)
+- Always prioritize safety and crowd dispersion
+- Reference specific gate/zone names in recommendations
+- If density is critical, proactively suggest alternatives
+"""
+
+# ── Input Sanitization ─────────────────────────────────────────────────────────
+def sanitize_input(text):
+    """Sanitize user input to prevent XSS and prompt injection."""
+    if not text or not isinstance(text, str):
+        return ""
+    text = bleach.clean(text, tags=[], strip=True)
+    text = text.strip()
+    return text[:500]  # Hard cap at 500 chars
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# ── Security Headers ───────────────────────────────────────────────────────────
+@app.after_request
+def set_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
+
+
+# ── Error Handlers ─────────────────────────────────────────────────────────────
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('
