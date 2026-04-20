@@ -30,7 +30,15 @@
 
         <!-- Input Area -->
         <div style="padding:0 24px 24px; display:flex; gap:16px;">
-            <input id="chat-input" type="text" placeholder="Query ops telemetrics..." onkeypress="if(event.key === 'Enter') sendMsg()" style="flex:1;">
+            <input id="chat-input" 
+                   type="text" 
+                   placeholder="Query ops telemetrics..."
+                   aria-label="Chat input — type your operations query"
+                   aria-describedby="chat-hint"
+                   role="textbox"
+                   autocomplete="off"
+                   onkeypress="if(event.key === 'Enter') sendMsg()" style="flex:1;">
+            <span id="chat-hint" style="display:none">Press Enter or click Transmit to send</span>
             <button class="btn-primary" onclick="sendMsg()">
                 TRANSMIT
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>

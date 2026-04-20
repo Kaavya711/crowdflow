@@ -81,6 +81,13 @@
 </head>
 <body>
 
+<a href="#main-content" 
+   style="position:absolute;top:-40px;left:0;background:#58A6FF;color:#0D1117;padding:8px;z-index:100;transition:top 0.2s;"
+   onfocus="this.style.top='0'" 
+   onblur="this.style.top='-40px'">
+  Skip to main content
+</a>
+
 <aside style="width:240px; background:#0D1117; border-right:1px solid #30363D; display:flex; flex-direction:column; z-index:10;">
   <!-- Logo area -->
   <div style="padding:24px 20px; border-bottom:1px solid #30363D; display:flex; align-items:center; gap:10px;">
@@ -93,23 +100,29 @@
   <!-- Nav label -->
   <div style="padding:20px 20px 8px;font-family:'Space Grotesk';font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.15em;color:#484F58;">Operations</div>
 
-  <nav style="display:flex; flex-direction:column;">
-    <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+  <nav style="display:flex; flex-direction:column;" role="navigation" aria-label="Main Navigation">
+    <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}"
+       role="menuitem" aria-label="Dashboard" aria-current="{% if request.endpoint == 'dashboard' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"></path></svg> Dashboard
     </a>
-    <a href="{{ url_for('stadium_map') }}" class="nav-item {% if request.endpoint == 'stadium_map' %}active{% endif %}">
+    <a href="{{ url_for('stadium_map') }}" class="nav-item {% if request.endpoint == 'stadium_map' %}active{% endif %}"
+       role="menuitem" aria-label="Stadium Map" aria-current="{% if request.endpoint == 'stadium_map' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Stadium Map
     </a>
-    <a href="{{ url_for('gates') }}" class="nav-item {% if request.endpoint == 'gates' %}active{% endif %}">
+    <a href="{{ url_for('gates') }}" class="nav-item {% if request.endpoint == 'gates' %}active{% endif %}"
+       role="menuitem" aria-label="Gates & Entrances" aria-current="{% if request.endpoint == 'gates' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2v20M10 2v20M2 10h20M2 14h20"></path></svg> Gates & Entrances
     </a>
-    <a href="{{ url_for('food') }}" class="nav-item {% if request.endpoint == 'food' %}active{% endif %}">
+    <a href="{{ url_for('food') }}" class="nav-item {% if request.endpoint == 'food' %}active{% endif %}"
+       role="menuitem" aria-label="Food & Drinks" aria-current="{% if request.endpoint == 'food' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 2v20M13 2v20M18 20V4a2 2 0 0 0-4 0v16M6 20V4a2 2 0 0 1 4 0v16"></path></svg> Food & Drinks
     </a>
-    <a href="{{ url_for('assistant') }}" class="nav-item {% if request.endpoint == 'assistant' %}active{% endif %}">
+    <a href="{{ url_for('assistant') }}" class="nav-item {% if request.endpoint == 'assistant' %}active{% endif %}"
+       role="menuitem" aria-label="AI Assistant" aria-current="{% if request.endpoint == 'assistant' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> AI Assistant
     </a>
-    <a href="{{ url_for('alerts') }}" class="nav-item {% if request.endpoint == 'alerts' %}active{% endif %}">
+    <a href="{{ url_for('alerts') }}" class="nav-item {% if request.endpoint == 'alerts' %}active{% endif %}"
+       role="menuitem" aria-label="Alerts" aria-current="{% if request.endpoint == 'alerts' %}page{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> Alerts
     </a>
   </nav>
@@ -121,7 +134,7 @@
   </div>
 </aside>
 
-<main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+<main id="main-content" role="main" aria-label="CrowdFlow Operations Panel" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
   <header style="height:64px;background:#0D1117;border-bottom:1px solid #30363D;display:flex;align-items:center;justify-content:space-between;padding:0 32px;flex-shrink:0;">
     <!-- Left: page title + live dot -->
     <div style="display:flex;align-items:center;gap:12px;">
@@ -163,7 +176,12 @@
   </div>
 </main>
 
-<div id="global-modal" style="position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;">
+<div id="global-modal" 
+     role="dialog" 
+     aria-modal="true" 
+     aria-labelledby="modal-title"
+     aria-describedby="modal-body"
+     style="position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;">
   <div class="modal-box" id="modal-container">
     <div style="padding:20px 24px;border-bottom:1px solid #30363D;display:flex;justify-content:space-between;align-items:center;">
       <h3 id="modal-title" style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;"></h3>

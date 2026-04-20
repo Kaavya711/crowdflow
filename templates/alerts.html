@@ -12,49 +12,16 @@
         <button id="btn-notifications" class="tab-btn" style="background:#161B22; border:1px solid #30363D; color:#8B949E; font-family:'Space Grotesk'; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:10px 24px; border-radius:30px; cursor:pointer;" onclick="switchTab('notifications', this)">Notifications</button>
     </div>
 
-    <!-- Warnings Tab -->
-    <div id="tab-warnings" class="tab-content" style="display:flex;flex-direction:column;gap:16px;">
-        <div class="cf-card clickable" style="box-shadow:inset 3px 0 0 #E3B341; background:linear-gradient(90deg, rgba(227,179,65,0.04) 0%, transparent 35%); padding:24px;"
-             onclick="openModal('CONCOURSE VOLUME', 'Volume exceeding safe load threshold.<br><br>Containment Strategy: Shift foot traffic laterally towards external ring exits.')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Main Concourse Volume Warning</h3>
-                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">08:14 UTC</span>
-            </div>
-            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">Volume exceeding safe load threshold. Chokepoints developing.</p>
-        </div>
-    </div>
-
-    <!-- Emergency Tab -->
-    <div id="tab-emergency" class="tab-content" style="display:none;flex-direction:column;gap:16px;">
-        <div class="cf-card clickable alert-emergency" style="box-shadow:inset 3px 0 0 #F85149; background:linear-gradient(90deg, rgba(248,81,73,0.04) 0%, transparent 35%); padding:24px;"
-             onclick="openModal('MEDICAL INCIDENT', 'Medical emergency declared in North Stand pedestrian corridor.<br><br>Containment Strategy: EMS dispatched. Isolate section via mobile barriers.')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Medical Incident at North Stand</h3>
-                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">08:02 UTC</span>
-            </div>
-            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">Immediate response requested. Corridor blockage projected.</p>
-        </div>
-    </div>
-
-    <!-- Notifications Tab -->
-    <div id="tab-notifications" class="tab-content" style="display:none;flex-direction:column;gap:16px;">
-        <div class="cf-card clickable" style="box-shadow:inset 3px 0 0 #58A6FF; background:linear-gradient(90deg, rgba(88,166,255,0.04) 0%, transparent 35%); padding:24px;"
-             onclick="openModal('INVENTORY PUSH', 'Push notification emitted regarding Combo Corner discount.<br><br>Containment Strategy: No operations changes required.')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">Inventory Push at Combo Corner</h3>
-                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">07:44 UTC</span>
-            </div>
-            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">20% push transmitted to active devices.</p>
-        </div>
-    </div>
+    <!-- Dynamic Alerts Container -->
+    <div id="alerts-container" style="display:flex;flex-direction:column;gap:16px;"></div>
 
 </div>
 
 <script>
+let currentTab = 'warnings';
+
 function switchTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    document.getElementById('tab-' + id).style.display = 'flex';
-    
+    currentTab = id;
     document.querySelectorAll('.tab-btn').forEach(el => {
         el.style.background = '#161B22';
         el.style.border = '1px solid #30363D';
@@ -64,6 +31,61 @@ function switchTab(id, btn) {
     btn.style.background = 'rgba(88,166,255,0.12)';
     btn.style.border = '1px solid rgba(88,166,255,0.3)';
     btn.style.color = '#58A6FF';
+    
+    renderAlerts(id);
 }
+
+// Simulate live alert feed
+const alertFeed = [
+  { type: 'emergency', title: 'Medical Incident at North Stand', time: '08:02 UTC', detail: 'EMS dispatched. Isolate via mobile barriers.' },
+  { type: 'warnings',  title: 'Main Concourse Volume Warning',   time: '08:14 UTC', detail: 'Shift traffic to external ring exits.' },
+  { type: 'notifications', title: 'Inventory Push at Combo Corner',  time: '07:44 UTC', detail: '20% discount transmitted to active devices.' },
+];
+
+let alertIndex = 0;
+function injectLiveAlert() {
+  const newAlert = {
+    type: 'warnings',
+    title: `Auto-Alert #${++alertIndex}: Sector ${String.fromCharCode(64 + alertIndex)} density spike`,
+    time: new Date().toISOString().split('T')[1].split('.')[0] + ' UTC',
+    detail: 'Automated telemetry threshold breach detected. Review recommended.'
+  };
+  alertFeed.unshift(newAlert);
+  renderAlerts(currentTab);
+}
+
+function renderAlerts(tabType) {
+    const container = document.getElementById('alerts-container');
+    container.innerHTML = '';
+    
+    const filtered = alertFeed.filter(a => a.type === tabType);
+    if(filtered.length === 0) {
+        container.innerHTML = '<p style="color:#8B949E; font-family:\'Space Grotesk\';">No active alerts.</p>';
+        return;
+    }
+    
+    filtered.forEach(alert => {
+        let color = '#58A6FF'; // Blue for notifications
+        if(alert.type === 'warnings') color = '#E3B341'; // Amber for warnings
+        if(alert.type === 'emergency') color = '#F85149'; // Red for emergency
+        
+        container.innerHTML += `
+        <div class="cf-card clickable" style="box-shadow:inset 3px 0 0 ${color}; background:linear-gradient(90deg, ${color}15 0%, transparent 35%); padding:24px;"
+             onclick="openModal('${alert.title.toUpperCase()}', '${alert.detail}')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#E6EDF3;">${alert.title}</h3>
+                <span style="font-family:'JetBrains Mono';font-size:11px;color:#8B949E;">${alert.time}</span>
+            </div>
+            <p style="font-family:'Space Grotesk';font-size:13px;color:#8B949E;line-height:1.6;">${alert.detail}</p>
+        </div>`;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    switchTab('warnings', document.getElementById('btn-warnings'));
+});
+
+// Inject a new alert every 30s to simulate live feed
+setInterval(injectLiveAlert, 30000);
 </script>
 {% endblock %}

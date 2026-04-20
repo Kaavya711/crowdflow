@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+import google.generativeai as genai
+from flask import Flask, render_template, request, jsonify
 import os
-import anthropic
 
 app = Flask(__name__)
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+# Configure Gemini
+api_key = "AIzaSyA526-tYs_3xmBhWQyRH_zF3zwWblEwglc"
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 VENUE_CONTEXT = """
 You are the AI Operations Assistant for CrowdFlow, an enterprise stadium management system.
@@ -16,28 +18,30 @@ Food: Burger House (10m wait), Green Bowl (2m wait), Combo Corner (5m wait - 20%
 Provide concise, authoritative, and actionable responses. Prioritize safety and crowd dispersion.
 """
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def dashboard():
-    recommendation = None
-    if request.method == 'POST':
-        seat_section = request.form.get('seat_section')
-        density = request.form.get('density')
-        need = request.form.get('need')
-        
-        # Example hardcoded logic
-        recs = []
-        if density == "High":
-            recs.append("Avoid Main Concourse.")
-        if need == "Food":
-            recs.append("Route via secondary external rings to Green Bowl per optimal queue threshold.")
-        elif need == "Exit":
-            recs.append("Redirect to Gate F (optimal throughput).")
-        
-        recommendation = " ".join(recs) if recs else f"Proceed to {need} via lowest density adjacent corridor."
-        
-    return render_template('dashboard.html', recommendation=recommendation, seat_section=request.form.get('seat_section', ''))
+    return render_template('dashboard.html', recommendation=None, seat_section=None)
 
-@app.route('/stadium-map')
+@app.route('/dashboard', methods=['POST'])
+def dashboard_post():
+    seat_section = request.form.get('seat_section')
+    density = request.form.get('density')
+    need = request.form.get('need')
+    prompt = f"""
+    {VENUE_CONTEXT}
+    A visitor is at: {seat_section}
+    Current crowd density: {density}
+    They need: {need}
+    Give a specific routing recommendation in 2-3 sentences.
+    """
+    try:
+        response = model.generate_content(prompt)
+        recommendation = response.text
+    except Exception as e:
+        recommendation = f"Unable to compute route: {str(e)}"
+    return render_template('dashboard.html', recommendation=recommendation, seat_section=seat_section)
+
+@app.route('/map')
 def stadium_map():
     return render_template('map.html')
 
@@ -60,25 +64,25 @@ def alerts():
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     data = request.json
-    messages = data.get('messages', [])
-    
-    formatted_messages = []
-    for msg in messages:
-        formatted_messages.append({
-            "role": msg["role"],
-            "content": msg["content"]
-        })
-        
-    try:
-        response = client.messages.create(
-            model="claude-3-opus-20240229",
-            max_tokens=600,
-            system=VENUE_CONTEXT,
-            messages=formatted_messages
-        )
-        return jsonify({"reply": response.content[0].text})
-    except Exception as e:
-        return jsonify({'reply': 'Secure channel initializing. Operations module standing by.'})
+    if not data:
+        return jsonify({"reply": "Invalid request."}), 400
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    messages = data.get('messages', [])
+    conversation = VENUE_CONTEXT + "\n\n"
+
+    for msg in messages:
+        role = msg.get('role', '').upper()
+        content = msg.get('content', '')
+        conversation += f"{role}: {content}\n"
+
+    try:
+        response = model.generate_content(conversation)
+        reply = response.text
+    except Exception as e:
+        reply = f"Error generating response: {str(e)}"
+
+    return jsonify({"reply": reply})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
