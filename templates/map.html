@@ -5,127 +5,242 @@
 {% block content %}
 <div style="display:flex;flex-direction:column;gap:32px;">
 
-  <!-- Google Maps Integration: Heat overlay for crowd density zones -->
-  <div id="gmap" style="width:100%;height:380px;border-radius:12px;border:1px solid #30363D;margin-bottom:24px;" 
-       role="img" 
-       aria-label="Interactive stadium heat map showing crowd density zones"></div>
+  <!-- SVG Stadium Density Map - No API required -->
+  <div
+    style="width:100%;border-radius:12px;border:1px solid #30363D;overflow:hidden;background:#0d1117;padding:16px;box-sizing:border-box;"
+    role="img" aria-label="Interactive stadium heat map showing crowd density zones">
 
-  <script>
-  // Google Maps JS API — Stadium density heat layer
-  function initMap() {
-    const stadiumCenter = { lat: 51.5555, lng: -0.1086 }; // Example: Emirates Stadium
+    <svg width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <radialGradient id="heatN" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#F85149" stop-opacity="0.7" />
+          <stop offset="100%" stop-color="#F85149" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heatC" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#F85149" stop-opacity="0.6" />
+          <stop offset="100%" stop-color="#F85149" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heatE" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#E3B341" stop-opacity="0.55" />
+          <stop offset="100%" stop-color="#E3B341" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heatW" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#E3B341" stop-opacity="0.45" />
+          <stop offset="100%" stop-color="#E3B341" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="heatS" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#3FB950" stop-opacity="0.4" />
+          <stop offset="100%" stop-color="#3FB950" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="pitchGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#1a3a1a" />
+          <stop offset="100%" stop-color="#0f2210" />
+        </radialGradient>
+      </defs>
 
-    const map = new google.maps.Map(document.getElementById("gmap"), {
-      zoom: 17,
-      center: stadiumCenter,
-      mapTypeId: "satellite",
-      disableDefaultUI: true,
-      styles: [
-        { elementType: "geometry", stylers: [{ color: "#0D1117" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#8B949E" }] },
-      ]
-    });
+      <!-- Stadium outer shell -->
+      <ellipse cx="340" cy="300" rx="290" ry="250" fill="#161b22" stroke="#30363d" stroke-width="1" />
+      <!-- Stadium seating ring -->
+      <ellipse cx="340" cy="300" rx="260" ry="222" fill="#0d1117" stroke="#21262d" stroke-width="0.5" />
 
-    // Density heatmap data points
-    const heatData = [
-      { location: new google.maps.LatLng(51.5560, -0.1086), weight: 9 }, // North Stand
-      { location: new google.maps.LatLng(51.5550, -0.1086), weight: 3 }, // South Stand
-      { location: new google.maps.LatLng(51.5555, -0.1075), weight: 7 }, // East Wing
-      { location: new google.maps.LatLng(51.5555, -0.1097), weight: 5 }, // West Wing
-      { location: new google.maps.LatLng(51.5558, -0.1090), weight: 8 }, // Concourse
-    ];
+      <!-- Pitch -->
+      <ellipse cx="340" cy="300" rx="155" ry="130" fill="url(#pitchGrad)" stroke="#238636" stroke-width="1" />
+      <line x1="340" y1="170" x2="340" y2="430" stroke="#2ea043" stroke-width="0.5" />
+      <ellipse cx="340" cy="300" rx="40" ry="33" fill="none" stroke="#2ea043" stroke-width="0.5" />
+      <circle cx="340" cy="300" r="3" fill="#2ea043" />
+      <rect x="306" y="170" width="68" height="24" rx="2" fill="none" stroke="#2ea043" stroke-width="0.5" />
+      <rect x="306" y="406" width="68" height="24" rx="2" fill="none" stroke="#2ea043" stroke-width="0.5" />
 
-    new google.maps.visualization.HeatmapLayer({
-      data: heatData,
-      map: map,
-      radius: 40,
-      gradient: ["rgba(0,0,0,0)", "#3FB950", "#E3B341", "#F85149"]
-    });
-  }
-  </script>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&libraries=visualization&callback=initMap">
-  </script>
+      <!-- Heat overlays -->
+      <ellipse cx="340" cy="108" rx="140" ry="70" fill="url(#heatN)" />
+      <ellipse cx="340" cy="300" rx="200" ry="175" fill="url(#heatC)" opacity="0.35" />
+      <ellipse cx="570" cy="300" rx="90" ry="120" fill="url(#heatE)" />
+      <ellipse cx="110" cy="300" rx="90" ry="120" fill="url(#heatW)" opacity="0.7" />
+      <ellipse cx="340" cy="492" rx="140" ry="70" fill="url(#heatS)" />
 
-  <!-- Legend -->
-  <div style="display:flex;align-items:center;justify-content:center;gap:32px;margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#3FB950;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#8B949E;">LOW</span></div>
-    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#E3B341;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#8B949E;">MEDIUM</span></div>
-    <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div><span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#E6EDF3;">CRITICAL</span></div>
+      <!-- North Stand - CRITICAL 92% -->
+      <rect x="275" y="58" width="130" height="52" rx="6" fill="#1a0f0f" stroke="#F85149" stroke-width="0.8" />
+      <circle cx="396" cy="62" r="5" fill="#F85149">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite" />
+      </circle>
+      <text x="340" y="78" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1.5">NORTH STAND</text>
+      <text x="340" y="98" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#F85149">92%</text>
+
+      <!-- South Stand - NOMINAL 41% -->
+      <rect x="275" y="506" width="130" height="52" rx="6" fill="#0a1a0a" stroke="#3FB950" stroke-width="0.8" />
+      <circle cx="396" cy="510" r="5" fill="#3FB950" />
+      <text x="340" y="526" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1.5">SOUTH STAND</text>
+      <text x="340" y="546" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#3FB950">41%</text>
+
+      <!-- East Wing - ELEVATED 74% -->
+      <rect x="582" y="246" width="82" height="52" rx="6" fill="#1a160a" stroke="#E3B341" stroke-width="0.8" />
+      <circle cx="655" cy="250" r="5" fill="#E3B341" />
+      <text x="623" y="266" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">EAST WING</text>
+      <text x="623" y="286" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#E3B341">74%</text>
+
+      <!-- West Wing - ELEVATED 54% -->
+      <rect x="16" y="246" width="82" height="52" rx="6" fill="#1a160a" stroke="#E3B341" stroke-width="0.8" />
+      <circle cx="89" cy="250" r="5" fill="#E3B341" />
+      <text x="57" y="266" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">WEST WING</text>
+      <text x="57" y="286" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#E3B341">54%</text>
+
+      <!-- Main Concourse - CRITICAL 88% -->
+      <rect x="420" y="140" width="130" height="52" rx="6" fill="#1a0f0f" stroke="#F85149" stroke-width="0.8" />
+      <circle cx="541" cy="144" r="5" fill="#F85149">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+      </circle>
+      <text x="485" y="160" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">CONCOURSE</text>
+      <text x="485" y="180" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#F85149">88%</text>
+
+      <!-- VIP Lounge - NOMINAL 22% -->
+      <rect x="420" y="420" width="100" height="52" rx="6" fill="#0a1a0a" stroke="#3FB950" stroke-width="0.8" />
+      <circle cx="511" cy="424" r="5" fill="#3FB950" />
+      <text x="470" y="440" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">VIP LOUNGE</text>
+      <text x="470" y="460" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#3FB950">22%</text>
+
+      <!-- Food Court - ELEVATED 68% -->
+      <rect x="160" y="420" width="100" height="52" rx="6" fill="#1a160a" stroke="#E3B341" stroke-width="0.8" />
+      <circle cx="251" cy="424" r="5" fill="#E3B341" />
+      <text x="210" y="440" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">FOOD COURT</text>
+      <text x="210" y="460" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#E3B341">68%</text>
+
+      <!-- Gate Plaza - NOMINAL 15% -->
+      <rect x="160" y="140" width="100" height="52" rx="6" fill="#0a1a0a" stroke="#3FB950" stroke-width="0.8" />
+      <circle cx="251" cy="144" r="5" fill="#3FB950" />
+      <text x="210" y="160" text-anchor="middle" font-family="monospace" font-size="9" fill="#8b949e"
+        letter-spacing="1">GATE PLAZA</text>
+      <text x="210" y="180" text-anchor="middle" font-family="monospace" font-size="20" font-weight="600"
+        fill="#3FB950">15%</text>
+
+      <!-- Pitch label -->
+      <text x="340" y="305" text-anchor="middle" font-family="monospace" font-size="11" fill="#2ea043"
+        letter-spacing="2">PITCH</text>
+
+      <!-- Legend -->
+      <rect x="170" y="578" width="340" height="30" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5" />
+      <circle cx="210" cy="593" r="5" fill="#3FB950" />
+      <text x="222" y="597" font-family="monospace" font-size="10" fill="#8b949e">LOW</text>
+      <circle cx="290" cy="593" r="5" fill="#E3B341" />
+      <text x="302" y="597" font-family="monospace" font-size="10" fill="#8b949e">ELEVATED</text>
+      <circle cx="400" cy="593" r="5" fill="#F85149">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite" />
+      </circle>
+      <text x="412" y="597" font-family="monospace" font-size="10" fill="#8b949e">CRITICAL</text>
+    </svg>
   </div>
 
   <!-- 8 Card Grid -->
   <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;">
-    
-    <div class="cf-card clickable" style="padding:20px;" onclick="openModal('NORTH STAND', 'Density: 92%<br>Severe bottleneck.')">
+
+    <div class="cf-card clickable" style="padding:20px;"
+      onclick="openModal('NORTH STAND', 'Density: 92%<br>Severe bottleneck. Redirect fans via Gate C.')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">NORTH STAND</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">NORTH
+          STAND</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">92%</div>
-      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">High Density</span>
-    </div>
-    
-    <div class="cf-card clickable" style="padding:20px;" onclick="openModal('MAIN CONCOURSE', 'Density: 88%')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">MAIN CONCOURSE</span>
-        <div style="width:8px;height:8px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">92%
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">88%</div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">High Density</span>
     </div>
 
+    <div class="cf-card clickable" style="padding:20px;"
+      onclick="openModal('MAIN CONCOURSE', 'Density: 88%<br>High congestion. Open auxiliary corridors.')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">MAIN
+          CONCOURSE</span>
+        <div style="width:8px;height:8px;border-radius:50%;background:#F85149;animation:pulse 2s infinite;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#F85149;margin-bottom:4px;">88%
+      </div>
+      <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">High Density</span>
+    </div>
+
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">EAST WING</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">EAST
+          WING</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">74%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">74%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
     </div>
 
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">FOOD COURT</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">FOOD
+          COURT</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">68%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">68%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
     </div>
 
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">WEST WING</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">WEST
+          WING</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#E3B341;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">54%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#E3B341;margin-bottom:4px;">54%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Elevated</span>
     </div>
 
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">SOUTH STAND</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">SOUTH
+          STAND</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">41%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">41%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
     </div>
 
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">VIP LOUNGE</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">VIP
+          LOUNGE</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">22%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">22%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
     </div>
 
     <div class="cf-card clickable" style="padding:20px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-        <span style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">GATE PLAZA</span>
+        <span
+          style="font-family:'Space Grotesk';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:#484F58;">GATE
+          PLAZA</span>
         <div style="width:8px;height:8px;border-radius:50%;background:#3FB950;"></div>
       </div>
-      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">15%</div>
+      <div style="font-family:'JetBrains Mono';font-size:30px;font-weight:500;color:#3FB950;margin-bottom:4px;">15%
+      </div>
       <span style="font-family:'Space Grotesk';font-size:12px;color:#8B949E;">Nominal</span>
     </div>
 
